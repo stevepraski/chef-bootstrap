@@ -17,7 +17,7 @@ for i in "$@"; do
     shift
     ;;
     -u=*|--user=*)
-    USER="${i#*=}"
+    ADMIN="${i#*=}"
     shift
     ;;
     *)
@@ -26,18 +26,18 @@ for i in "$@"; do
   esac
 done
 
-if [[ -z ${USER} ]]; then
-  echo " --> WARNING: Assuming SSH user 'sysop'"
-  USER="sysop"
+if [[ -z ${ADMIN} ]]; then
+  echo " --> INFO: Assuming SSH user 'sysop'"
+  ADMIN="sysop"
 fi
 
 if [[ -z ${PORT} ]]; then
-  echo " --> WARNING: Assuming port 22"
+  echo " --> INFO: Assuming port '22'"
   PORT="22"
 fi
 
 if [[ -z ${SSH_KEY} ]]; then
-  echo " --> WARNING: No SSH key specified"
+  echo " --> INFO: No SSH key specified"
 else
   SSH_KEY_PATH="${HOME}/.ssh/${SSH_KEY}"
   if [[ ! -f $SSH_KEY_PATH ]]; then
@@ -86,7 +86,7 @@ else
   echo " +-> Cookbooks vendored with Berkshelf"
 fi
 
-SSH_PARAMS="-p ${PORT} ${SSH_ID_PARAM} ${USER}@${SERVER}"
+SSH_PARAMS="-p ${PORT} ${SSH_ID_PARAM} ${ADMIN}@${SERVER}"
 RSYNC_PARAMS="-rltD -e \"ssh ${SSH_ID_PARAM} -p ${PORT}\" --rsync-path=\"sudo rsync\""
 
 # setup chef directory structure
@@ -97,11 +97,11 @@ echo " +-> Chef directories created"
 ssh ${SSH_PARAMS} "if which yum; then sudo yum -y install rsync; else sudo apt-get install -y rsync; fi;"
 echo " +-> 'rsync' installed or present"
 
-rsync -rltD -e "ssh ${SSH_ID_PARAM} -p ${PORT}" --rsync-path="sudo rsync" berks-cookbooks/ ${USER}@${SERVER}:/var/chef/cookbooks
+rsync -rltD -e "ssh ${SSH_ID_PARAM} -p ${PORT}" --rsync-path="sudo rsync" berks-cookbooks/ ${ADMIN}@${SERVER}:/var/chef/cookbooks
 echo " +-> Cookbooks transfered"
 
 # attributes and runlist
-rsync -rltD -e "ssh ${SSH_ID_PARAM} -p ${PORT}" --rsync-path="sudo rsync" chef-solo.json ${USER}@${SERVER}:/etc/chef
+rsync -rltD -e "ssh ${SSH_ID_PARAM} -p ${PORT}" --rsync-path="sudo rsync" chef-solo.json ${ADMIN}@${SERVER}:/etc/chef
 echo " +-> 'chef-solo.json' transfered "
 
 # chef

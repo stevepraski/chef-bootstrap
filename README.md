@@ -16,6 +16,7 @@
  - designed to be executed from a workstation with the Chef development kit (ChefDK) installed
  - requires a 'chef-solo.json' run list and a cookbook
  - vendors and transfers cookbooks and then executes the run list on the target server
+ - assumes that the specified SSH user has sudo rights, which is true for most "cloud" servers, but not necessarily for bare metal or private virtual machines.  As a workaround, the 'root' user can be used, especially if a SSH public key is placed in '/root/.ssh/authorized_keys'.  The best practice is to disable the 'root' user login access via SSH after an administration user with sudo rights is added.
 
 #### Vagrant Testing Example for 'chef-solo-bootstrap.sh'
  - make a directory and initiate a vagrant box, increase its memory allocation and start it:
